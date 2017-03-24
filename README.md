@@ -1,4 +1,4 @@
-# IPA Generator 2.0 (Python) 
+# IPA Generator 2.0 (Python 3) 
 Converts English text to IPA notation
 
 I noticed some people were making use of my first IPA program, so I decided to write a better version. This program utilizes the Carnegie-Mellon University Phonetic Dictionary Database to convert English words into IPA. 
@@ -20,4 +20,3 @@ Some notes:
 * Words which cannot be found in the CMU dictionary are ignored and simply reprinted. 
 * Simple punctuation is stripped away (?, !, ., etc). 
 * Should only take one line of input at a time
-* The program exits by typing __quit__
