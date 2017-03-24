@@ -3,7 +3,7 @@ import re
 """
 IPA GENERATOR 2.0
 Author: Michael Phillips
-Last update: 3/23/17
+Last update: 3/24/17
 
 A simple script for converting English words into IPA notation.
 The conversion relies on the CMU Phonetic Dictionary. As such, if a word entry is missing, the word is not converted
@@ -13,7 +13,7 @@ this program can return either just the top result or every possible combination
 
 
 def cmu_words():
-    """returns a dictionary of words and their CMU phonetic transcriptions"""
+    """returns a dictionary of words from the CMU dictionary and their phonetic notation"""
     cmu_file = open('CMU_dict.txt', 'r+')  # assumes the file is in the same directory!
     words = []
     phonetics = []
@@ -64,7 +64,7 @@ def cmu_to_ipa(cmu_list):
 
 def get_top(ipa_list):
     """Returns only the one result for a query. If multiple entries for words are found, only the first is used."""
-    return ' '.join([[word for word in word_list][0] for word_list in ipa_list])
+    return ' '.join([word_list[-1] for word_list in ipa_list])
 
 
 def get_all(ipa_list):
@@ -88,32 +88,58 @@ def get_all(ipa_list):
     final = [sent[:-1] for sent in list_all]
     return final
 
+def get_ipa_list(words_in):
+    """returns a list of all the discovered IPA transcriptions for each word"""
+    if type(words_in) == str:
+        words_in = words_in.lower().split(" ")
+    cmu_list = get_cmu(words_in)
+    ipa_words = cmu_to_ipa(cmu_list)
+    return ipa_words           
+        
 
-def convert(input):
-    cmu_list = get_cmu(input)
+def isin_cmu(word):
+    """checks if a word is in the CMU dictionary. Doesn't strip punctuation. 
+    If given more than one word, returns True only if all words are present."""
+    if type(word) == list or len(word.split(" ")) > 1:
+        if type(word)==str:
+            word = word.split(" ")
+        for w in word:
+            if w.lower() not in word_dict:
+                return False
+        return True
+    return word.lower() in word_dict
+
+
+def convert(user_in, retrieve='TOP'):
+    """takes either a string or list of English words and converts them to IPA"""
+    if type(user_in) == str:
+        user_in = user_in.lower().split(" ")
+    cmu_list = get_cmu(user_in)
     ipa_words = cmu_to_ipa(cmu_list)  # converts the CMU phonetic pronunciations to IPA notation
-    ipa_final = get_top(ipa_words)  # also an option
-    # ipa_final = get_all(ipa_words)
-    if type(ipa_final) == list:
-        print("List of possible transcriptions: ")
-        for sent_num in range(len(ipa_final)):
-            if len(ipa_final) > 1:
-                print(str(sent_num + 1) + ". " + ipa_final[sent_num])  # print list of numbered results
-            else:
-                print(ipa_final[sent_num])
+    if retrieve.lower() == 'all':
+        ipa_final = get_all(ipa_words)  # also an option
     else:
-        print(ipa_final)
+        ipa_final = get_top(ipa_words)  # gets top by default
+    return ipa_final
 
 def main():
     """loops through user inputs and returns IPA notations until __quit__ is typed"""
     list_of_lines = []
     user_in = input("Input: ").lower().split(" ")
-    while user_in != ['__quit__']:
-        convert(user_in)
-        user_in = input("Input: ").lower().split()
+    while user_in != [''] and user_in != ['__quit__']:
+        ipa = convert(user_in, retrieve='TOP')
+        if type(ipa) == list: # if retrieve=ALL
+            if len(ipa) > 1:
+                print("List of possible transcriptions: ")
+                for sent_num in range(len(ipa)):
+                    print(str(sent_num + 1) + ". " + ipa[sent_num])  # print list of numbered results
+            else:
+                print(ipa[0]) # when ALL is used but there's only one result
+        else:
+            print(ipa)
+        user_in = input("Input: ").lower().split(" ")
 
-
+word_dict = cmu_words()
 if __name__ == "__main__":
-    word_dict = cmu_words()
     print("English to IPA 2.0")
     main()
