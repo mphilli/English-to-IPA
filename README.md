@@ -12,8 +12,6 @@ I noticed some people were making use of my first IPA program, so I decided to w
     3. ənæʧərli
     4. ənnæʧrəli
 
-The get_all function returns all transcriptions given the possible combinations thereof, and the get_top function returns only the first result. 
-
 Some notes and key functions:
 
 * The CMU_dict.txt file must be in the same directory as conversion.py in order to work! 
