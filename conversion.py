@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import re
+import os
 """
 IPA GENERATOR 2.0
 Author: Michael Phillips
@@ -14,7 +15,7 @@ this program can return either just the top result or every possible combination
 
 def cmu_words():
     """returns a dictionary of words from the CMU dictionary and their phonetic notation"""
-    cmu_file = open('CMU_dict.txt', 'r+')  # assumes the file is in the same directory!
+    cmu_file = open(os.path.join(os.path.abspath(os.path.dirname(__file__)),  'CMU_dict.txt'), 'r+')  # assumes the file is in the same directory!
     words = []
     phonetics = []
     for line in cmu_file.readlines():
@@ -94,11 +95,11 @@ def get_ipa_list(words_in):
         words_in = words_in.lower().split(" ")
     cmu_list = get_cmu(words_in)
     ipa_words = cmu_to_ipa(cmu_list)
-    return ipa_words           
-        
+    return ipa_words
+
 
 def isin_cmu(word):
-    """checks if a word is in the CMU dictionary. Doesn't strip punctuation. 
+    """checks if a word is in the CMU dictionary. Doesn't strip punctuation.
     If given more than one word, returns True only if all words are present."""
     if type(word) == list or len(word.split(" ")) > 1:
         if type(word)==str:
