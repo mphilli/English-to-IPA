@@ -36,7 +36,6 @@ def get_cmu(user_in):
     """converts the user's input to the CMU phonetics, returns a list of all entries found for each word"""
     cmu_list = []  # a list of CMU phonetic representations for the input words
     word_dict = cmu_words()
-    user_in = [re.sub("[:;,\.\?\"!]", "", word) for word in user_in]
     for word in user_in:
         if word in word_dict:
             # add the CMU phonetic representation(s) to the list
@@ -106,7 +105,9 @@ def get_all(ipa_list):
 def ipa_list(words_in):
     """Returns a list of all the discovered IPA transcriptions for each word."""
     if type(words_in) == str:
-        words_in = words_in.lower().split(" ")
+        words_in = [preprocess(w) for w in words_in.split(' ')]
+    else:
+        words_in = [preprocess(w) for w in words_in]
     cmu_list = get_cmu(words_in)
     ipa_words = cmu_to_ipa(cmu_list)
     return ipa_words
@@ -118,7 +119,7 @@ def isin_cmu(word):
     word_dict = cmu_words()
     if type(word) == list or len(word.split(" ")) > 1:
         if type(word) == str:
-            word = preprocess(word).split(" ")
+            word = [preprocess(w) for w in word.split(' ')]
         else:
             word = [preprocess(w) for w in word]
         for w in word:
@@ -131,7 +132,7 @@ def isin_cmu(word):
 def convert(user_in, retrieve='TOP'):
     """takes either a string or list of English words and converts them to IPA"""
     if type(user_in) == str:
-        user_in = user_in.lower().split(" ")
+        user_in = [preprocess(w) for w in user_in.split(' ')]
     cmu_list = get_cmu(user_in)
     ipa_words = cmu_to_ipa(cmu_list)  # converts the CMU phonetic pronunciations to IPA notation
     if retrieve.lower() == 'all':

@@ -1,8 +1,2 @@
 .idea
-.idea/English_to_IPA.iml
-.idea/markdown-navigator/
-.idea/misc.xml
-.idea/modules.xml
-.idea/workspace.xml
 __pycache__/
-*.pyc
