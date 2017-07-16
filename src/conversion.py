@@ -173,4 +173,4 @@ def convert(user_in, retrieve='TOP'):
     return ipa_final
 
 if __name__ == "__main__":
-    print(get_cmu("that's my favorite film".split(" ")))
+    os.system('python main.py')  # execute main.py script
