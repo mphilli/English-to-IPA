@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 import re
 import os
+import stress
+
 """
 IPA GENERATOR
 Author: Michael G. Phillips
-Last update: 5/29/2017
+Last update: 7/16/2017
 
-A simple script for converting English words into IPA notation.
+A simple script for converting English words into IPA notation (American English).
 The conversion relies on the CMU Phonetic Dictionary. As such, if a word entry is missing, the word is not converted
 to IPA, and the original is returned. There is sometimes more than one correct pronunciation of a word, and so
 we can return either just the top result or every possible combination of results.
@@ -15,7 +17,7 @@ we can return either just the top result or every possible combination of result
 
 def cmu_words():
     """returns a dictionary of words from the CMU dictionary and their phonetic notation"""
-    cmu_file = open(os.path.join(os.path.abspath(os.path.dirname(__file__)),  'CMU_dict.txt'), 'r+')
+    cmu_file = open(os.path.join(os.path.abspath(os.path.dirname(__file__)),  'resources\CMU_dict.txt'), 'r+')
     words = []
     phonetics = []
     for line in cmu_file.readlines():
@@ -24,6 +26,8 @@ def cmu_words():
     cmu_dict = {w: p for w, p in zip(words, phonetics)}
     cmu_file.close()
     return cmu_dict
+
+word_dict = cmu_words()
 
 
 def preprocess(words):
@@ -35,7 +39,7 @@ def preprocess(words):
 def get_cmu(user_in):
     """converts the user's input to the CMU phonetics, returns a list of all entries found for each word"""
     cmu_list = []  # a list of CMU phonetic representations for the input words
-    word_dict = cmu_words()
+
     for word in user_in:
         if word in word_dict:
             # add the CMU phonetic representation(s) to the list
@@ -46,7 +50,7 @@ def get_cmu(user_in):
     return cmu_list
 
 
-def cmu_to_ipa(cmu_list, mark=True):
+def cmu_to_ipa(cmu_list, mark=True, stress_marking=True):
     """converts the CMU word lists into IPA transcriptions"""
     symbols = {"a": "ə", "ey": "e", "aa": "ɑ", "ae": "æ", "ah": "ə", "ao": "ɔ", "aw": "aʊ", "ay": "aɪ", "ch": "ʧ",
                "dh": "ð", "eh": "ɛ", "er": "ər", "hh": "h", "ih": "ɪ", "jh": "ʤ", "ng": "ŋ",  "ow": "oʊ", "oy": "ɔɪ",
@@ -55,19 +59,42 @@ def cmu_to_ipa(cmu_list, mark=True):
     for word_list in cmu_list:
         ipa_word_list = []  # the word list for each word
         for word in word_list:
-            word = re.sub("[0-9]", "", word)  # ignore stress markings for now
+            if stress_marking:
+                word = stress.find_stress(word)
+            else:
+                if re.sub("\d*", "", word.replace("__IGNORE__", "")) == "":
+                    pass  # do not delete token if it's all numbers
+                else:
+                    #  word = re.sub("[0-9]", "", word)
+                    pass
             ipa_form = ''
             if word.startswith("__IGNORE__"):
                 ipa_form = word.replace("__IGNORE__", "")
                 # mark words we couldn't transliterate with an asterisk:
+
                 if mark:
-                    ipa_form += "*"
+                    if not re.sub("\d*", "", ipa_form) == "":
+                        ipa_form += "*"
             else:
                 for piece in word.split(" "):
-                    if piece in symbols:
-                        ipa_form += symbols[piece]
+                    marked = False
+                    unmarked = piece
+                    if piece[0] in ["ˈ", "ˌ"]:
+                        marked = True
+                        mark = piece[0]
+                        unmarked = piece[1:]
+                    if unmarked in symbols:
+                        if marked:
+                            ipa_form += mark + symbols[unmarked]
+                        else:
+                            ipa_form += symbols[unmarked]
+
                     else:
                         ipa_form += piece
+            swap_list = [["ˈər", "əˈr"], ["ˈie", "iˈe"]]
+            for sym in swap_list:
+                if not ipa_form.startswith(sym[0]):
+                    ipa_form = ipa_form.replace(sym[0], sym[1])
             ipa_word_list.append(ipa_form)
         ipa_list.append(sorted(list(set(ipa_word_list))))
     return ipa_list
@@ -133,6 +160,10 @@ def convert(user_in, retrieve='TOP'):
     """takes either a string or list of English words and converts them to IPA"""
     if type(user_in) == str:
         user_in = [preprocess(w) for w in user_in.split(' ')]
+    elif type(user_in == list):
+        user_in = [preprocess(w) for w in user_in]
+    if '' in user_in:  # strip inputs "*" tokens
+        user_in.remove('')
     cmu_list = get_cmu(user_in)
     ipa_words = cmu_to_ipa(cmu_list)  # converts the CMU phonetic pronunciations to IPA notation
     if retrieve.lower() == 'all':
@@ -140,3 +171,6 @@ def convert(user_in, retrieve='TOP'):
     else:
         ipa_final = get_top(ipa_words)  # gets top by default
     return ipa_final
+
+if __name__ == "__main__":
+    print(get_cmu("that's my favorite film".split(" ")))

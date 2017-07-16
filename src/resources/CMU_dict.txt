@@ -45395,7 +45395,7 @@ gorriak g ao1 r iy0 ae0 k
 gorrid g ao1 r ah0 d
 gorrids g ao1 r ah0 d z
 gorski g ao1 r s k iy0
-gorsky g ao1 r s k iy0
+gorsky g ao1 r s k iy0[
 gorsline g ao1 r s l ay2 n
 gorsuch g ao1 r s ah0 ch
 gort g ao1 r t

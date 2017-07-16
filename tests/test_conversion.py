@@ -47,18 +47,20 @@ class TestConversion(unittest.TestCase):
         self.assertEqual(conversion.ipa_list('This is a test phrase.'), [['ðɪs'], ['ɪz'], ['e'], ['tɛst'], ['frez']])
         # test on example sentence from README
         self.assertEqual(conversion.ipa_list('The receptionists were busy.'),
-                         [['ði', 'ðə'], ['risɛpʃənɪs', 'risɛpʃənɪsts',
-                                         'rɪsɛpʃənɪs', 'rɪsɛpʃənɪsts'], ['wər'], ['bɪzi']])
+                         [['ði', 'ðə'], ['riˈsɛpʃənɪs', 'riˈsɛpʃənɪsts',
+                                         'rɪˈsɛpʃənɪs', 'rɪˈsɛpʃənɪsts'], ['wər'], ['ˈbɪzi']])
 
     def test_convert(self):
         # example from the README:
         self.assertEqual(conversion.convert('The quick brown fox jumped over the lazy dog.'),
-                         'ðə kwɪk braʊn fɑks ʤəmpt oʊvər ðə lezi dɔg')
+                         'ðə kwɪk braʊn fɑks ʤəmpt ˈoʊvər ðə ˈlezi dɔg')
         # test same with retrieve=ALL, should return a list
         # this also tests the efficacy of the get_all() algorithm
         self.assertEqual(conversion.convert('The quick brown fox jumped over the lazy dog.', retrieve='ALL'),
-                         ['ði kwɪk braʊn fɑks ʤəmpt oʊvər ði lezi dɔg', 'ði kwɪk braʊn fɑks ʤəmpt oʊvər ðə lezi dɔg',
-                          'ðə kwɪk braʊn fɑks ʤəmpt oʊvər ði lezi dɔg', 'ðə kwɪk braʊn fɑks ʤəmpt oʊvər ðə lezi dɔg'])
+                         ['ði kwɪk braʊn fɑks ʤəmpt ˈoʊvər ði ˈlezi dɔg',
+                          'ði kwɪk braʊn fɑks ʤəmpt ˈoʊvər ðə ˈlezi dɔg',
+                          'ðə kwɪk braʊn fɑks ʤəmpt ˈoʊvər ði ˈlezi dɔg',
+                          'ðə kwɪk braʊn fɑks ʤəmpt ˈoʊvər ðə ˈlezi dɔg'])
 
 if __name__ == "__main__":
     unittest.main()
