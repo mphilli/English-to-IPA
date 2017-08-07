@@ -1,0 +1,4 @@
+## words which don't receive proper stress marking
+estuary - FIXED (added basic support for hiatus)
+arrest
+maria

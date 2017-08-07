@@ -16,8 +16,8 @@ class TestConversion(unittest.TestCase):
 
     def test_find_stress(self):
         test_string = "reflect respect recline reduce obsessively demonstrate baseball cloud brother cobblestone " +\
-            "complete conspire conflict"
-        raw_cmu = conversion.get_cmu(test_string.split(" ")[:-1])
+            "complete conspire estuary"
+        raw_cmu = conversion.get_cmu(test_string.split(" "))
         result = []
         for word_list in raw_cmu:
             for word in word_list:
@@ -26,7 +26,8 @@ class TestConversion(unittest.TestCase):
         self.assertEqual(result, ['r ah ˈf l eh k t', 'r ih ˈf l eh k t', 'r ih ˈs p eh k t', 'r iy ˈs p eh k t',
                                   'r ih ˈk l ay n', 'r ih ˈd uw s', 'aa b ˈs eh s ih v l iy',
                                   'ˈd eh m ah n ˌs t r ey t', 'ˈb ey s ˈb ao l', 'k l aw d', 'ˈb r ah dh er',
-                                  'ˈk aa b ah l ˌs t ow n', 'k ah m ˈp l iy t', 'k ah n ˈs p ay er'])
+                                  'ˈk aa b ah l ˌs t ow n', 'k ah m ˈp l iy t', 'k ah n ˈs p ay er',
+                                  'ˈeh s ch uw ˌeh r iy'])
 
         # test the retrieval of only primary stress
         self.assertEqual(stress.find_stress("d eh1 m ah0 n s t r ey2 t", type="primary"), 'ˈd eh m ah n s t r ey t')

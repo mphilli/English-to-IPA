@@ -8,16 +8,19 @@
 
 import os
 import re
+import logging
 
 version = "0.7b"
 unique_dict = {}
 pattern = "([A-Za-z\-\._']+)\(\d\)"
-print("running cmudict_preparer...")
+logging.basicConfig(level=logging.INFO)
+logging.info("running cmudict_preparer...")
 
 # read info from old file
 with open(os.path.join(os.path.abspath(os.path.dirname(__file__)),
-                       '..\src\\resources\CMU_source_files/cmudict-' + version + '.txt'), encoding="UTF-8") as file:
-    print("reading source file...")
+                       '..\src\\resources\CMU_source_files/cmudict-' + version + '.txt'),
+          encoding="UTF-8") as file:
+    logging.info("reading source file...")
     for line in file.readlines():
         if line.startswith(";;;"):
             pass  # ignore comment lines, if not already removed
@@ -31,9 +34,9 @@ with open(os.path.join(os.path.abspath(os.path.dirname(__file__)),
 # write info to new file
 new_file_name = 'PREPARED-cmudict-' + version + '.txt'
 with open(os.path.join(os.path.abspath(os.path.dirname(__file__)),
-                       new_file_name), "w+", encoding="UTF-8") as prepared:
+                       new_file_name), "w", encoding="UTF-8") as prepared:
     for entry in unique_dict:
         line = entry + " " + unique_dict[entry]
         prepared.write(line.replace("\n", "").replace("% ", "%").lower() + "\n")
-    print(new_file_name + " created.")
+    logging.info(new_file_name + " created.")
 

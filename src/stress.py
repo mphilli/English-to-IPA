@@ -52,13 +52,18 @@ def find_stress(word, type="all"):
         new_word = []
         clusters = ["sp", "st", "sk", "fr", "fl"]
         stop_set = ["nasal", "fricative", "vowel"]  # stop searching for where stress starts if these are encountered
+        # for each CMU symbol
         for c in symbols:
+            # if the last character is a 1 or 2 (that means it has stress, and we want to evaluate it)
             if c[-1] in stress_map.keys():
+                # if the new_word list is empty
                 if not new_word:
+                    # append to new_word the CMU symbol, replacing numbers with stress marks
                     new_word.append(re.sub("\d", "", stress_map[re.findall("\d", c)[0]] + c))
                 else:
                     stress_mark = stress_map[c[-1]]
                     placed = False
+                    hiatus = False
                     new_word = new_word[::-1]  # flip the word and backtrack through symbols
                     for i, sym in enumerate(new_word):
                         sym = re.sub("[0-9ˈˌ]", "", sym)
@@ -70,14 +75,20 @@ def find_stress(word, type="all"):
                             elif not prev_phone == "vowel" and i > 0:
                                 new_word[i-1] = stress_mark + new_word[i-1]
                             else:
-                                new_word[i] = stress_mark + new_word[i]
+                                if phones[sym] == "vowel":
+                                    hiatus = True
+                                    new_word = [stress_mark + re.sub("[0-9ˈˌ]", "", c)] + new_word
+                                else:
+                                    new_word[i] = stress_mark + new_word[i]
                             placed = True
                             break
                     if not placed:
                         if new_word:
                             new_word[len(new_word) - 1] = stress_mark + new_word[len(new_word) - 1]
                     new_word = new_word[::-1]
-                    new_word.append(re.sub("\d", "", c))
+                    if not hiatus:
+                        new_word.append(re.sub("\d", "", c))
+                        hiatus = False
             else:
                 if c.startswith("__IGNORE__"):
                     new_word.append(c)
