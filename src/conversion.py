@@ -36,6 +36,33 @@ def preprocess(words):
     return ' '.join([w.strip(punct_str).lower() for w in words.split()])
 
 
+def preserve_punc(words):
+    """converts words to IPA and finds punctuation before and after the word."""
+    words_preserved = []
+    for w in words.split():
+        punct_list = ["", preprocess(w), ""]
+        before = re.search("^([^A-Za-z0-9]+)[A-Za-z]", w)
+        after = re.search("[A-Za-z]([^A-Za-z0-9]+)$", w)
+        if before:
+            punct_list[0] = str(before.group(1))
+        if after:
+            punct_list[2] = str(after.group(1))
+        words_preserved.append(punct_list)
+    return words_preserved
+
+
+def punct_ipa(str_in):
+    """takes a string of text and returns as IPA, with punctuation preserved"""
+    pres_ipa = preserve_punc(str_in)
+    for i, comb in enumerate(pres_ipa):
+        _cmu = get_cmu([comb[1]])
+        _ipa = cmu_to_ipa(_cmu)
+        _result = get_top(_ipa)
+        pres_ipa[i][1] = _result
+    return ''.join([''.join([w for w in word]) + " "
+                    for word in pres_ipa])
+
+
 def get_cmu(user_in):
     """converts the user's input to the CMU phonetics, returns a list of all entries found for each word"""
     cmu_list = []  # a list of CMU phonetic representations for the input words
@@ -156,21 +183,25 @@ def isin_cmu(word):
     return word.lower() in word_dict
 
 
-def convert(user_in, retrieve='TOP'):
+def convert(user_in, retrieve_all=False, keep_punct=False):
     """takes either a string or list of English words and converts them to IPA"""
-    if type(user_in) == str:
-        user_in = [preprocess(w) for w in user_in.split(' ')]
-    elif type(user_in == list):
-        user_in = [preprocess(w) for w in user_in]
-    if '' in user_in:  # strip inputs "*" tokens
-        user_in.remove('')
-    cmu_list = get_cmu(user_in)
-    ipa_words = cmu_to_ipa(cmu_list)  # converts the CMU phonetic pronunciations to IPA notation
-    if retrieve.lower() == 'all':
-        ipa_final = get_all(ipa_words)  # also an option
+    if keep_punct and type(user_in) == str:
+        return punct_ipa(user_in)
     else:
-        ipa_final = get_top(ipa_words)  # gets top by default
-    return ipa_final
+        if type(user_in) == str:
+            user_in = [preprocess(w) for w in user_in.split(' ')]
+        elif type(user_in == list):
+            user_in = [preprocess(w) for w in user_in]
+        if '' in user_in:  # strip inputs "*" tokens
+            user_in.remove('')
+
+        cmu_list = get_cmu(user_in)
+        ipa_words = cmu_to_ipa(cmu_list)  # converts the CMU phonetic pronunciations to IPA notation
+        if retrieve_all:
+            ipa_final = get_all(ipa_words)  # also an option
+        else:
+            ipa_final = get_top(ipa_words)  # gets top by default
+        return ipa_final
 
 if __name__ == "__main__":
     os.system('python main.py')  # execute main.py script
