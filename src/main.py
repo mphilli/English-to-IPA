@@ -28,7 +28,7 @@ if __name__ == "__main__":
     main()
 
 """
-7/16/2017
+1/31/2018
 TODO:
 
 * Allow a retrieve_all for IPA with preserved punctuation

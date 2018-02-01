@@ -6,7 +6,7 @@ import stress
 """
 IPA GENERATOR
 Author: Michael G. Phillips
-Last update: 7/16/2017
+Last update: 1/31/2018
 
 A simple script for converting English words into IPA notation (American English).
 The conversion relies on the CMU Phonetic Dictionary. As such, if a word entry is missing, the word is not converted
@@ -59,7 +59,7 @@ def punct_ipa(str_in):
         _ipa = cmu_to_ipa(_cmu)
         _result = get_top(_ipa)
         pres_ipa[i][1] = _result
-    return ''.join([''.join([w for w in word]) + " "
+    return ' '.join([''.join([w for w in word])
                     for word in pres_ipa])
 
 

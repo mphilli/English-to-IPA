@@ -27,5 +27,9 @@ This program utilizes the Carnegie-Mellon University Phonetic Dictionary Databas
 
         ipa_list('The receptionists were busy.')
         [['ði', 'ðə'], ['riˈsɛpʃənɪs', 'riˈsɛpʃənɪsts', 'rɪˈsɛpʃənɪs', 'rɪˈsɛpʃənɪsts'], ['wər'], ['bɪzi']]
+* **punct_ipa(str_in)** - takes a string of text and returns it converted to IPA, with the punctuation marks reserved. 
+
+      punct_ipa('"Wow, how amazing!", she exclaimed."')
+      "waʊ, haʊ əˈmezɪŋ!", ʃi ɪkˈsklemd." 
 
 
