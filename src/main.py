@@ -3,6 +3,7 @@
 # If you want to keep punctuation in the result, set keep_punct=True
 # If you want to get all possible IPA transcriptions, set retrieve_all=True
 # Currently, keep_punct=True only returns one result (not all)
+# last update: 3/13/2018
 import conversion
 
 
@@ -26,13 +27,3 @@ def main():
 if __name__ == "__main__":
     print("English to IPA")
     main()
-
-"""
-1/31/2018
-TODO:
-
-* Allow a retrieve_all for IPA with preserved punctuation
-* Continue to improve and debug stress marking and syllable recognition
-* Preserve the capitalization and punctuation of unrecognized tokens (?)
-* Add logging and exception handling to functions
-"""

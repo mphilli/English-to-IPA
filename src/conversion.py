@@ -1,33 +1,12 @@
 # -*- coding: utf-8 -*-
 import re
-import os
+from os.path import join, abspath, dirname
 import stress
+import sqlite3
+from collections import defaultdict
 
-"""
-IPA GENERATOR
-Author: Michael G. Phillips
-Last update: 1/31/2018
-
-A simple script for converting English words into IPA notation (American English).
-The conversion relies on the CMU Phonetic Dictionary. As such, if a word entry is missing, the word is not converted
-to IPA, and the original is returned. There is sometimes more than one correct pronunciation of a word, and so
-we can return either just the top result or every possible combination of results.
-"""
-
-
-def cmu_words():
-    """returns a dictionary of words from the CMU dictionary and their phonetic notation"""
-    cmu_file = open(os.path.join(os.path.abspath(os.path.dirname(__file__)),  'resources\CMU_dict.txt'), 'r+')
-    words = []
-    phonetics = []
-    for line in cmu_file.readlines():
-        words.append(line.split()[0])
-        phonetics.append(' '.join(line.split()[1:]).split('%'))
-    cmu_dict = {w: p for w, p in zip(words, phonetics)}
-    cmu_file.close()
-    return cmu_dict
-
-word_dict = cmu_words()
+conn = sqlite3.connect(join(abspath(dirname(__file__)), "./resources/CMU_dict.db"))
+c = conn.cursor()
 
 
 def preprocess(words):
@@ -63,18 +42,27 @@ def punct_ipa(str_in):
                     for word in pres_ipa])
 
 
-def get_cmu(user_in):
-    """converts the user's input to the CMU phonetics, returns a list of all entries found for each word"""
-    cmu_list = []  # a list of CMU phonetic representations for the input words
+def fetch_words(words_in):
+    quest = "?, " * len(words_in)
+    c.execute(f"SELECT word, phonemes FROM dictionary WHERE word IN ({quest[:-2]})", words_in)
+    result = c.fetchall()
+    d = defaultdict(list)
+    for k, v in result:
+        d[k].append(v)
+    return list(d.items())
 
+
+def get_cmu(user_in):
+    """query the SQL database for the words and return the phonemes in the order of user_in"""
+    result = fetch_words(user_in)
+    ordered = []
     for word in user_in:
-        if word in word_dict:
-            # add the CMU phonetic representation(s) to the list
-            cmu_list.append(word_dict[word])
+        this_word = [[i[1] for i in result if i[0] == word]][0]
+        if this_word:
+            ordered.append(this_word[0])
         else:
-            # If the word cannot be found in the CMU dictionary, we will ignore it
-            cmu_list.append(['__IGNORE__' + word])
-    return cmu_list
+            ordered.append(["__IGNORE__" + word])
+    return ordered
 
 
 def cmu_to_ipa(cmu_list, mark=True, stress_marking=True):
@@ -170,17 +158,11 @@ def ipa_list(words_in):
 def isin_cmu(word):
     """checks if a word is in the CMU dictionary. Doesn't strip punctuation.
     If given more than one word, returns True only if all words are present."""
-    word_dict = cmu_words()
-    if type(word) == list or len(word.split(" ")) > 1:
-        if type(word) == str:
-            word = [preprocess(w) for w in word.split(' ')]
-        else:
-            word = [preprocess(w) for w in word]
-        for w in word:
-            if w.lower() not in word_dict:
-                return False
-        return True
-    return word.lower() in word_dict
+    if type(word) == str:
+        word = [preprocess(w) for w in word.split(" ")]
+    results = fetch_words(word)
+    as_set = list(set(t[0] for t in results))
+    return len(as_set) == len(word)
 
 
 def convert(user_in, retrieve_all=False, keep_punct=False):
@@ -202,7 +184,3 @@ def convert(user_in, retrieve_all=False, keep_punct=False):
         else:
             ipa_final = get_top(ipa_words)  # gets top by default
         return ipa_final
-
-if __name__ == "__main__":
-    os.system('python main.py')  # execute main.py script
-

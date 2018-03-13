@@ -1,4 +1,4 @@
-# IPA Generator (Python 3)
+### IPA Generator (Python 3.6+)
 Converts English text to IPA notation
 
 This program utilizes the Carnegie-Mellon University Phonetic Dictionary Database to convert English words into IPA.
