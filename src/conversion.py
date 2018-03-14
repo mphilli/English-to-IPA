@@ -162,7 +162,7 @@ def isin_cmu(word):
         word = [preprocess(w) for w in word.split(" ")]
     results = fetch_words(word)
     as_set = list(set(t[0] for t in results))
-    return len(as_set) == len(word)
+    return len(as_set) == len(set(word))
 
 
 def convert(user_in, retrieve_all=False, keep_punct=False):
