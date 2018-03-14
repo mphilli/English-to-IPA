@@ -1,7 +1,7 @@
-### IPA Generator (Python 3.6+)
+### English to IPA (Python 3.6+)
 Converts English text to IPA notation
 
-This program utilizes the Carnegie-Mellon University Phonetic Dictionary Database to convert English words into IPA.
+This program utilizes the Carnegie-Mellon University Pronouncing Dictionary to convert English words into the [International Phonetic Alphabet](https://en.wikipedia.org/wiki/International_Phonetic_Alphabet).
 
 
     English to IPA
@@ -31,5 +31,3 @@ This program utilizes the Carnegie-Mellon University Phonetic Dictionary Databas
 
       punct_ipa('"Wow, how amazing!", she exclaimed."')
       "waʊ, haʊ əˈmezɪŋ!", ʃi ɪkˈsklemd." 
-
-
