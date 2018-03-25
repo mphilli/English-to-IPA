@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-import stress
-import conversion
+from eng_to_ipa import stress, transcribe
 import unittest
 
 
@@ -17,7 +16,7 @@ class TestConversion(unittest.TestCase):
     def test_find_stress(self):
         test_string = "reflect respect recline reduce obsessively demonstrate baseball cloud brother cobblestone " +\
             "complete conspire estuary"
-        raw_cmu = conversion.get_cmu(test_string.split(" "))
+        raw_cmu = transcribe.get_cmu(test_string.split(" "))
         result = []
         for word_list in raw_cmu:
             for word in word_list:

@@ -1,33 +1,65 @@
-### English to IPA (Python 3.6+)
-Converts English text to IPA notation
-
-This program utilizes the Carnegie-Mellon University Pronouncing Dictionary to convert English words into the [International Phonetic Alphabet](https://en.wikipedia.org/wiki/International_Phonetic_Alphabet).
+### English to IPA (eng_to_ipa)
 
 
-    English to IPA
-    Word or Phrase: unnaturally
-    List of possible transcriptions: 
-    1. ənˈnæʧrəli
-    2. ənˈnæʧərli
-    3. ənˈnæʧərəli
-    4. əˈnæʧərli
+This Python program utilizes the Carnegie-Mellon University Pronouncing Dictionary to convert English text into the [International Phonetic Alphabet](https://en.wikipedia.org/wiki/International_Phonetic_Alphabet).
 
 
-#### Some notes and key functions:
+The `convert` function is used to take English text and convert it to IPA, like so:
 
+```Python
+>>> import eng_to_ipa as ipa
+>>> ipa.convert("The quick brown fox jumped over the lazy dog.")
+'ðə kwɪk braʊn fɑks ʤəmpt ˈoʊvər ðə ˈlezi dɔg.'
+``` 
 
-* Words which cannot be found in the CMU dictionary are ignored and reprinted with an asterisk.
-* Stress marking and syllable counting is currently still being developed.
-* **convert(input, retrieve)** - takes a string or list of English text and returns it as a single IPA string. If the **retrieve** parameter is set to 'ALL', a list is instead returned, with all possible combinations of discovered transcriptions returned. 
-            
-      convert('The quick brown fox jumped over the lazy dog.')
-      ðə kwɪk braʊn fɑks ʤəmpt ˈoʊvər ðə ˈlezi dɔg
-* **isin_cmu(word)** - checks if a given word or phrase is in the CMU phonetic dictionary. If a phrase is given, only returns true if all words are in the dictionary. 
-* **ipa_list(input)** - returns each transcribed IPA token as a list of all discovered transcriptions.
+Note that words that cannot be found in the CMU dictionary are simply reprinted with an asterisk.
 
-        ipa_list('The receptionists were busy.')
-        [['ði', 'ðə'], ['riˈsɛpʃənɪs', 'riˈsɛpʃənɪsts', 'rɪˈsɛpʃənɪs', 'rɪˈsɛpʃənɪsts'], ['wər'], ['bɪzi']]
-* **punct_ipa(str_in)** - takes a string of text and returns it converted to IPA, with the punctuation marks reserved. 
+#### `convert` parameters
 
-      punct_ipa('"Wow, how amazing!", she exclaimed."')
-      "waʊ, haʊ əˈmezɪŋ!", ʃi ɪkˈsklemd." 
+* **text** : *string* - The input string of English text to be converted to IPA notation.
+
+* **keep_punct** : *boolean, optional (default=True)* - Determines whether or not the punctuation marks from the input string
+should be retained or not.
+
+* **retrieve_all** : *boolean, optional (default=False)* - Given that some words might have more than one transcription,
+this parameter determines whether or not a list of all possible combinations of transcriptions should be returned (True)
+ or just the string of one transcription (False).
+ 
+* **stress_marks** : *string, optional (default='both')* - Determines whether or not the primary and secondary stress 
+markings (ˈ, ˌ) should be retained. Understood arguments are:
+   * "primary" - retains primary stress only 
+   * "secondary" - retains secondary stress only
+   * "both" - to keep both primary and secondary stress markers. 
+   
+The `ipa_list` function returns a list of each word as a list of all its possible transcriptions. It has all the same
+optional `stress_marks` and `keep_punct` parameters as `convert`.
+```Python
+>>> ipa.ipa_list("The record was expensive.")
+[['ði', 'ðə'], ['rəˈkɔrd', 'rɪˈkɔrd', 'ˈrɛkərd'], ['wɑz'], ['ɪkˈspɛnsɪv.']]
+```
+
+The `isin_cmu` function takes a word (or list of words) and checks if it is in the CMU pronouncing dictionary (returns 
+`True` or `False`). If a list of words is provided, then `True` will only be returned if *every* provided word is in the dictionary.
+
+```Python
+>>> ipa.isin_cmu("The dentist opened a new practice.")
+True
+>>> ipa.isin_cmu("emoji")
+False
+```
+
+The `get_rhymes` function returns a list of rhymes for a word or set of words. 
+```Python
+>>> ipa.get_rhymes("rhyming function")
+[['climbing', 'diming', 'liming', 'priming', 'timing'], ['compunction', 'conjunction', 'dysfunction', 'injunction', 'junction', 'malfunction']]
+```
+   
+The `syllable_count` function returns an integer, corresponding to the number of syllables in a word. Returns a list of 
+syllable counts if more than one word is provided in the input string.
+
+```Python
+>>> ipa.syllable_count("computer programming")
+[3, 3]
+```
+
+For another Python package that offers support for rhyming and syllable counts (as well as other cool things), see [pronouncingpy](https://github.com/aparrish/pronouncingpy).

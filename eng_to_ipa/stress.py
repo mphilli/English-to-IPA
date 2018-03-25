@@ -1,7 +1,7 @@
 import os
 import re
 import json
-import syllables
+import eng_to_ipa.syllables as syllables
 import logging
 
 
@@ -41,10 +41,10 @@ with open(os.path.join(os.path.abspath(os.path.dirname(__file__)),
 
 def find_stress(word, type="all"):
     """Convert stress marking numbers from CMU into actual stress markings
-    :param word - the CMU word string to be evaluated for stress markings
-    :param type - type of stress to be evaluated (primary, secondary, or both)"""
+    :param word: the CMU word string to be evaluated for stress markings
+    :param type: type of stress to be evaluated (primary, secondary, or both)"""
 
-    syll_count = syllables.count(word)
+    syll_count = syllables.cmu_syllable_count(word)
 
     if (not word.startswith("__IGNORE__")) and syll_count > 1:
         symbols = word.split(' ')

@@ -1,5 +1,5 @@
 # Simple rhyming support. Call get_rhymes() on a word to find rhymes from the CMU dictionary.
-from conversion import c, get_cmu
+from eng_to_ipa.transcribe import c, get_cmu, preprocess
 
 
 def remove_onset(word_in):
@@ -10,10 +10,10 @@ def remove_onset(word_in):
 
 
 def get_rhymes(word):
-    if " " in word:
-        return [get_rhymes(w) for w in word.split(" ")]
-    phones = remove_onset(word.lower())
-    phones_full = get_cmu([word.lower()])[0][0]
+    if len(word.split()) > 1:
+        return [get_rhymes(w) for w in word.split()]
+    phones = remove_onset(preprocess(word))
+    phones_full = get_cmu([preprocess(word)])[0][0]
     c.execute(f"SELECT word, phonemes FROM dictionary WHERE phonemes "
               f"LIKE \"%{phones}\" AND NOT word=\"{word}\" "  # don't count word as its own rhyme
               f"AND NOT phonemes=\"{phones_full}\"")  # don't return results that are the same but spelled differently
@@ -21,7 +21,7 @@ def get_rhymes(word):
 
 
 if __name__ == "__main__":
-    word = "testing"
-    rhymes = get_rhymes(word)
+    test = "testing"
+    rhymes = get_rhymes(test)
     for rhyme in rhymes:
         print(rhyme)

@@ -1,6 +1,7 @@
 import re
 import os
 import json
+from eng_to_ipa import transcribe
 
 
 with open(os.path.join(os.path.abspath(os.path.dirname(__file__)),
@@ -11,7 +12,8 @@ with open(os.path.join(os.path.abspath(os.path.dirname(__file__)),
 hiatus = [["er", "iy"], ["iy", "ow"], ["uw", "ow"], ["iy", "ah"], ["iy", "ey"], ["uw", "eh"], ["er", "eh"]]
 
 
-def count(word):
+def cmu_syllable_count(word):
+    """count syllables based on CMU transcription"""
     word = re.sub("\d", "", word).split(' ')
     if "__IGNORE__" in word[0]:
         return 0
@@ -26,3 +28,11 @@ def count(word):
                 elif [prev_sym, sym] in hiatus:
                     nuclei += 1
         return nuclei
+
+
+def syllable_count(word: str):
+    """transcribes a regular word to CMU to fetch syllable count"""
+    if len(word.split()) > 1:
+        return [syllable_count(w) for w in word.split()]
+    word = transcribe.get_cmu([transcribe.preprocess(word)])
+    return cmu_syllable_count(word[0][0])

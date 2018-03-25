@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import re
 from os.path import join, abspath, dirname
-import stress
+import eng_to_ipa.stress as stress
 import sqlite3
 from collections import defaultdict
 
@@ -30,19 +30,30 @@ def preserve_punc(words):
     return words_preserved
 
 
-def punct_ipa(str_in):
-    """takes a string of text and returns as IPA, with punctuation preserved"""
-    pres_ipa = preserve_punc(str_in)
-    for i, comb in enumerate(pres_ipa):
-        _cmu = get_cmu([comb[1]])
-        _ipa = cmu_to_ipa(_cmu)
-        _result = get_top(_ipa)
-        pres_ipa[i][1] = _result
-    return ' '.join([''.join([w for w in word])
-                    for word in pres_ipa])
+def apply_punct(triple, as_str=False):
+    """places surrounding punctuation back on center on a list of preserve_punc triples"""
+    if type(triple[0]) == list:
+        for i, t in enumerate(triple):
+            triple[i] = str(''.join(triple[i]))
+        if as_str:
+            return ' '.join(triple)
+        return triple
+    if as_str:
+        return str(''.join(t for t in triple))
+    return [''.join(t for t in triple)]
+
+
+def _punct_replace_word(original, transcription):
+    """Get the IPA transcription of word with the original punctuation marks"""
+    for i, trans_list in enumerate(transcription):
+        for j, item in enumerate(trans_list):
+            triple = [original[i][0]] + [item] + [original[i][2]]
+            transcription[i][j] = apply_punct(triple, as_str=True)
+    return transcription
 
 
 def fetch_words(words_in):
+    """fetches a list of words from the database"""
     quest = "?, " * len(words_in)
     c.execute(f"SELECT word, phonemes FROM dictionary WHERE word IN ({quest[:-2]})", words_in)
     result = c.fetchall()
@@ -52,11 +63,11 @@ def fetch_words(words_in):
     return list(d.items())
 
 
-def get_cmu(user_in):
+def get_cmu(tokens_in):
     """query the SQL database for the words and return the phonemes in the order of user_in"""
-    result = fetch_words(user_in)
+    result = fetch_words(tokens_in)
     ordered = []
-    for word in user_in:
+    for word in tokens_in:
         this_word = [[i[1] for i in result if i[0] == word]][0]
         if this_word:
             ordered.append(this_word[0])
@@ -65,23 +76,23 @@ def get_cmu(user_in):
     return ordered
 
 
-def cmu_to_ipa(cmu_list, mark=True, stress_marking=True):
+def cmu_to_ipa(cmu_list, mark=True, stress_marking='all'):
     """converts the CMU word lists into IPA transcriptions"""
-    symbols = {"a": "ə", "ey": "e", "aa": "ɑ", "ae": "æ", "ah": "ə", "ao": "ɔ", "aw": "aʊ", "ay": "aɪ", "ch": "ʧ",
-               "dh": "ð", "eh": "ɛ", "er": "ər", "hh": "h", "ih": "ɪ", "jh": "ʤ", "ng": "ŋ",  "ow": "oʊ", "oy": "ɔɪ",
+    symbols = {"a": "ə", "ey": "e", "aa": "ɑ", "ae": "æ", "ah": "ə", "ao": "ɔ",
+               "aw": "aʊ", "ay": "aɪ", "ch": "ʧ", "dh": "ð", "eh": "ɛ", "er": "ər",
+               "hh": "h", "ih": "ɪ", "jh": "ʤ", "ng": "ŋ",  "ow": "oʊ", "oy": "ɔɪ",
                "sh": "ʃ", "th": "θ", "uh": "ʊ", "uw": "u", "zh": "ʒ", "iy": "i", "y": "j"}
     ipa_list = []  # the final list of IPA tokens to be returned
     for word_list in cmu_list:
         ipa_word_list = []  # the word list for each word
         for word in word_list:
             if stress_marking:
-                word = stress.find_stress(word)
+                word = stress.find_stress(word, type=stress_marking)
             else:
                 if re.sub("\d*", "", word.replace("__IGNORE__", "")) == "":
                     pass  # do not delete token if it's all numbers
                 else:
-                    #  word = re.sub("[0-9]", "", word)
-                    pass
+                    word = re.sub("[0-9]", "", word)
             ipa_form = ''
             if word.startswith("__IGNORE__"):
                 ipa_form = word.replace("__IGNORE__", "")
@@ -123,11 +134,9 @@ def get_top(ipa_list):
 def get_all(ipa_list):
     """utilizes an algorithm to discover and return all possible combinations of IPA transcriptions"""
     final_size = 1
-
     for word_list in ipa_list:
         final_size *= len(word_list)
     list_all = ["" for s in range(final_size)]
-
     for i in range(len(ipa_list)):
         if i == 0:
             swtich_rate = final_size / len(ipa_list[i])
@@ -140,47 +149,39 @@ def get_all(ipa_list):
             if k == len(ipa_list[i]):
                 k = 0
             list_all[j] = list_all[j] + ipa_list[i][k] + " "
-
     return sorted([sent[:-1] for sent in list_all])
 
 
-def ipa_list(words_in):
+def ipa_list(words_in, keep_punct=True, stress_marks='both'):
     """Returns a list of all the discovered IPA transcriptions for each word."""
     if type(words_in) == str:
-        words_in = [preprocess(w) for w in words_in.split(' ')]
+        words = [preserve_punc(w.lower())[0] for w in words_in.split()]
     else:
-        words_in = [preprocess(w) for w in words_in]
-    cmu_list = get_cmu(words_in)
-    ipa_words = cmu_to_ipa(cmu_list)
-    return ipa_words
+        words = [preserve_punc(w.lower())[0] for w in words_in]
+    cmu = get_cmu([w[1] for w in words])
+    ipa = cmu_to_ipa(cmu, stress_marking=stress_marks)
+    if keep_punct:
+        ipa = _punct_replace_word(words, ipa)
+    return ipa
 
 
 def isin_cmu(word):
     """checks if a word is in the CMU dictionary. Doesn't strip punctuation.
     If given more than one word, returns True only if all words are present."""
     if type(word) == str:
-        word = [preprocess(w) for w in word.split(" ")]
+        word = [preprocess(w) for w in word.split()]
     results = fetch_words(word)
     as_set = list(set(t[0] for t in results))
     return len(as_set) == len(set(word))
 
 
-def convert(user_in, retrieve_all=False, keep_punct=False):
+def convert(text, retrieve_all=False, keep_punct=True, stress_marks='both'):
     """takes either a string or list of English words and converts them to IPA"""
-    if keep_punct and type(user_in) == str:
-        return punct_ipa(user_in)
-    else:
-        if type(user_in) == str:
-            user_in = [preprocess(w) for w in user_in.split(' ')]
-        elif type(user_in == list):
-            user_in = [preprocess(w) for w in user_in]
-        if '' in user_in:  # strip inputs "*" tokens
-            user_in.remove('')
-
-        cmu_list = get_cmu(user_in)
-        ipa_words = cmu_to_ipa(cmu_list)  # converts the CMU phonetic pronunciations to IPA notation
-        if retrieve_all:
-            ipa_final = get_all(ipa_words)  # also an option
-        else:
-            ipa_final = get_top(ipa_words)  # gets top by default
-        return ipa_final
+    ipa = ipa_list(
+                   words_in=text,
+                   keep_punct=keep_punct,
+                   stress_marks=stress_marks
+                   )
+    if retrieve_all:
+        return get_all(ipa)
+    return get_top(ipa)
