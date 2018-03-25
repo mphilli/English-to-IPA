@@ -3,7 +3,7 @@ import sqlite3
 import re
 from os.path import join, abspath, dirname
 
-conn = sqlite3.connect(join(abspath(dirname(__file__)), "../src/resources/CMU_dict.db"))
+conn = sqlite3.connect(join(abspath(dirname(__file__)), "../eng_to_ipa/resources/CMU_dict.db"))
 c = conn.cursor()
 
 
@@ -24,7 +24,7 @@ def create_dictionary_table():
 def insert_dictionary_values():
     """takes the prepared data and places it into the database"""
     dictionary_data = []
-    with open(join(abspath(dirname(__file__)), '..\src\\resources\CMU_source_files/cmudict-0.7b.txt'),
+    with open(join(abspath(dirname(__file__)), '..\eng_to_ipa\\resources\CMU_source_files/cmudict-0.7b.txt'),
               encoding="UTF-8") as source_file:
         for line in source_file.readlines():
             word = re.sub("\(\d\)", "", line.split("  ")[0]).lower()
