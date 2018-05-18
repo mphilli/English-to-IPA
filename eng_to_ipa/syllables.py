@@ -5,7 +5,7 @@ from eng_to_ipa import transcribe
 
 
 with open(os.path.join(os.path.abspath(os.path.dirname(__file__)),
-                       'resources\phones.json'), "r") as phones_json:
+                       'resources','phones.json'), "r") as phones_json:
     PHONES = json.load(phones_json)
 
 # list of adjacent vowel symbols that constitute separate nuclei
