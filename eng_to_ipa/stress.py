@@ -9,13 +9,13 @@ def create_phones_json():
     """Creates the phones.json file in the resources directory from the phones.txt source file from CMU"""
     phones_dict = {}
     with open(os.path.join(os.path.abspath(os.path.dirname(__file__)),
-                           'resources\CMU_source_files\cmudict-0.7b.phones.txt'), encoding="UTF-8") as phones_txt:
+                           'resources','CMU_source_files','cmudict-0.7b.phones.txt'), encoding="UTF-8") as phones_txt:
         # source link: http://svn.code.sf.net/p/cmusphinx/code/trunk/cmudict/cmudict-0.7b.phones
         for line in phones_txt.readlines():
             phones_dict[line.split("	")[0].lower()] = line.split("	")[1].replace("\n", "")
 
     with open(os.path.join(os.path.abspath(os.path.dirname(__file__)),
-                           'resources\phones.json'), "w") as phones_json:
+                           'resources','phones.json'), "w") as phones_json:
         json.dump(phones_dict, phones_json)
 
 
@@ -35,7 +35,7 @@ def stress_type(stress):
         return default
 
 with open(os.path.join(os.path.abspath(os.path.dirname(__file__)),
-                   'resources\phones.json'), "r") as phones_json:
+                   'resources','phones.json'), "r") as phones_json:
     phones = json.load(phones_json)
 
 
@@ -108,5 +108,5 @@ if __name__ == "__main__":
     # create phones dictionary from source if not found in the resources directory
     if not os.path.isfile(os.path.join(
             os.path.abspath(os.path.dirname(__file__)),
-            'resources\phones.json')):
+            'resources','phones.json')):
         create_phones_json()
