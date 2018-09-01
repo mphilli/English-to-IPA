@@ -9,5 +9,6 @@ setup(
     description='take English text and convert it to IPA',
     author=['mphilli', 'Mitchellpkt', 'CanadianCommander', 'timvancann'],
     long_description=long_description,
+    include_package_data=True,
     packages=['eng_to_ipa'],
 )
