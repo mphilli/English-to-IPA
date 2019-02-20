@@ -58,7 +58,7 @@ The `get_rhymes` function returns a list of rhymes for a word or set of words.
 >>> ipa.get_rhymes("rhyming function")
 [['climbing', 'diming', 'liming', 'priming', 'timing'], ['compunction', 'conjunction', 'dysfunction', 'injunction', 'junction', 'malfunction']]
 ```
-*Use the function `jhymes` function instead to force usage of the JSON database.*
+*Use the `jhymes` function instead to force usage of the JSON database.*
    
 The `syllable_count` function returns an integer, corresponding to the number of syllables in a word. Returns a list of 
 syllable counts if more than one word is provided in the input string.
