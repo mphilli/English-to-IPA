@@ -1,5 +1,5 @@
 # Simple rhyming support. Call get_rhymes() on a word to find rhymes from the CMU dictionary.
-from eng_to_ipa.transcribe import c, get_cmu, preprocess
+from eng_to_ipa.transcribe import mode_type, get_cmu, preprocess
 
 
 def remove_onset(word_in):
@@ -9,15 +9,30 @@ def remove_onset(word_in):
             return ' '.join(phone_list[i:])
 
 
-def get_rhymes(word):
+def get_rhymes(word, mode="sql"):
     if len(word.split()) > 1:
         return [get_rhymes(w) for w in word.split()]
     phones = remove_onset(preprocess(word))
     phones_full = get_cmu([preprocess(word)])[0][0]
-    c.execute(f"SELECT word, phonemes FROM dictionary WHERE phonemes "
-              f"LIKE \"%{phones}\" AND NOT word=\"{word}\" "  # don't count word as its own rhyme
-              f"AND NOT phonemes=\"{phones_full}\"")  # don't return results that are the same but spelled differently
-    return sorted(list(set([r[0] for r in c.fetchall()])))
+    if mode == "sql":
+        c = mode_type(mode)
+        c.execute(f"SELECT word, phonemes FROM dictionary WHERE phonemes " 
+                  f"LIKE \"%{phones}\" AND NOT word=\"{word}\" "  # don't count word as its own rhyme
+                  f"AND NOT phonemes=\"{phones_full}\"")
+        # also don't return results that are the same but spelled differently
+        return sorted(list(set([r[0] for r in c.fetchall()])))
+    elif mode == "json":
+        r_list = []
+        for key, val in mode_type(mode).items():
+            for v in val:
+                if v.endswith(phones) and word != key and v != phones_full:
+                    r_list.append(key)
+        return sorted(set(r_list))
+
+
+def jhymes(word):
+    """Get rhymes with forced JSON mode."""
+    return get_rhymes(word, mode="json")
 
 
 if __name__ == "__main__":

@@ -30,9 +30,9 @@ def cmu_syllable_count(word):
         return nuclei
 
 
-def syllable_count(word: str):
+def syllable_count(word: str, db_type="sql"):
     """transcribes a regular word to CMU to fetch syllable count"""
     if len(word.split()) > 1:
         return [syllable_count(w) for w in word.split()]
-    word = transcribe.get_cmu([transcribe.preprocess(word)])
+    word = transcribe.get_cmu([transcribe.preprocess(word)], db_type=db_type)
     return cmu_syllable_count(word[0][0])

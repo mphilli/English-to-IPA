@@ -31,6 +31,9 @@ markings (ˈ, ˌ) should be retained. Understood arguments are:
    * "secondary" - retains secondary stress only
    * "both" - to keep both primary and secondary stress markers. 
    
+* **mode** : *string, optional (default='sql')* - Accepts "sql" or "json", depending on which version of the database you'd like to use.
+ As another option for JSON users, simply use the function `jonvert` instead of `convert`. 
+   
 The `ipa_list` function returns a list of each word as a list of all its possible transcriptions. It has all the same
 optional `stress_marks` and `keep_punct` parameters as `convert`.
 ```Python
@@ -53,6 +56,7 @@ The `get_rhymes` function returns a list of rhymes for a word or set of words.
 >>> ipa.get_rhymes("rhyming function")
 [['climbing', 'diming', 'liming', 'priming', 'timing'], ['compunction', 'conjunction', 'dysfunction', 'injunction', 'junction', 'malfunction']]
 ```
+*Use the function `jhymes` function instead to force usage of the JSON database.*
    
 The `syllable_count` function returns an integer, corresponding to the number of syllables in a word. Returns a list of 
 syllable counts if more than one word is provided in the input string.

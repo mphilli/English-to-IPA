@@ -38,6 +38,6 @@ if __name__ == "__main__":
     create_dictionary_table()
     insert_dictionary_values()
     # small test to verify valid database creation:
-    c.execute("SELECT * FROM dictionary WHERE word like \"%rose%\"")
+    c.execute("SELECT * FROM dictionary WHERE word like \"%the%\"")
     for r in c.fetchall():
         print(str(r))
