@@ -66,7 +66,7 @@ def fetch_words(words_in, db_type="sql"):
     asset = mode_type(db_type)
     if db_type.lower() == "sql":
         quest = "?, " * len(words_in)
-        asset.execute(f"SELECT word, phonemes FROM dictionary WHERE word IN ({quest[:-2]})", words_in)
+        asset.execute("SELECT word, phonemes FROM dictionary WHERE word IN ({0})".format(quest[:-2]), words_in)
         result = asset.fetchall()
         d = defaultdict(list)
         for k, v in result:

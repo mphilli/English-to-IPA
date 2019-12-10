@@ -16,9 +16,9 @@ def get_rhymes(word, mode="sql"):
     phones_full = get_cmu([preprocess(word)])[0][0]
     if mode == "sql":
         c = mode_type(mode)
-        c.execute(f"SELECT word, phonemes FROM dictionary WHERE phonemes " 
-                  f"LIKE \"%{phones}\" AND NOT word=\"{word}\" "  # don't count word as its own rhyme
-                  f"AND NOT phonemes=\"{phones_full}\"")
+        c.execute("SELECT word, phonemes FROM dictionary WHERE phonemes " 
+                  "LIKE \"%{0}\" AND NOT word=\"{1}\" ".format(phones, word) +
+                  "AND NOT phonemes=\"{0}\"".format(phones_full))
         # also don't return results that are the same but spelled differently
         return sorted(list(set([r[0] for r in c.fetchall()])))
     elif mode == "json":
