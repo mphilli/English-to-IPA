@@ -19,5 +19,6 @@ class TestConversion(unittest.TestCase):
         for j, word in enumerate(test_hiatus.split()):
             self.assertEqual(syllables.syllable_count(word), hiatus_counts[j])
 
+
 if __name__ == "__main__":
     unittest.main()
