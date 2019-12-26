@@ -1,4 +1,0 @@
-[
-  "tests/test_stress.py::TestConversion::test_find_stress",
-  "tests/test_stress.py::TestConversion::test_stress_type"
-]
