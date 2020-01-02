@@ -11,7 +11,7 @@ The `convert` function is used to take English text and convert it to IPA, like 
 ```Python
 >>> import eng_to_ipa as ipa
 >>> ipa.convert("The quick brown fox jumped over the lazy dog.")
-'ðə kwɪk braʊn fɑks ʤəmpt ˈoʊvər ðə ˈlezi dɔg.'
+'ðə kwɪk braʊn fɑks ʤəmpt ˈoʊvər ðə ˈleɪzi dɔg.'
 ``` 
 
 Note that words that cannot be found in the CMU dictionary are simply reprinted with an asterisk.
