@@ -5,6 +5,12 @@
 
 This Python program utilizes the Carnegie-Mellon University Pronouncing Dictionary to convert English text into the [International Phonetic Alphabet](https://en.wikipedia.org/wiki/International_Phonetic_Alphabet).
 
+### Installation ### 
+
+`python -m pip install eng_to_ipa`
+
+### Key functions ###
+
 
 The `convert` function is used to take English text and convert it to IPA, like so:
 
@@ -69,5 +75,3 @@ syllable counts if more than one word is provided in the input string.
 ```
 
 For another Python package that offers support for rhyming and syllable counts (as well as other cool things), see [pronouncingpy](https://github.com/aparrish/pronouncingpy).
-
-Note: I'd like to make this project easily available/installable from pip, but I don't know how. Looking for help!
