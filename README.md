@@ -42,12 +42,16 @@ markings (ˈ, ˌ) should be retained. Understood arguments are:
 * **mode** : *string, optional (default='sql')* - Accepts "sql" or "json", depending on which version of the database you'd like to use.
  As another option for JSON users, simply use the function `jonvert` instead of `convert`. 
    
+#### `ipa_list`
+
 The `ipa_list` function returns a list of each word as a list of all its possible transcriptions. It has all the same
 optional `stress_marks` and `keep_punct` parameters as `convert`.
 ```Python
 >>> ipa.ipa_list("The record was expensive.")
 [['ði', 'ðə'], ['rəˈkɔrd', 'rɪˈkɔrd', 'ˈrɛkərd'], ['wɑz'], ['ɪkˈspɛnsɪv.']]
 ```
+   
+#### `isin_cmu`
 
 The `isin_cmu` function takes a word (or list of words) and checks if it is in the CMU pronouncing dictionary (returns 
 `True` or `False`). If a list of words is provided, then `True` will only be returned if *every* provided word is in the dictionary.
@@ -58,6 +62,8 @@ True
 >>> ipa.isin_cmu("emoji")
 False
 ```
+   
+#### `get_rhymes`
 
 The `get_rhymes` function returns a list of rhymes for a word or set of words. 
 ```Python
@@ -66,6 +72,8 @@ The `get_rhymes` function returns a list of rhymes for a word or set of words.
 ```
 *Use the `jhymes` function instead to force usage of the JSON database.*
    
+#### `syllable_count`
+
 The `syllable_count` function returns an integer, corresponding to the number of syllables in a word. Returns a list of 
 syllable counts if more than one word is provided in the input string.
 
@@ -73,5 +81,7 @@ syllable counts if more than one word is provided in the input string.
 >>> ipa.syllable_count("computer programming")
 [3, 3]
 ```
+
+### Other Resources
 
 For another Python package that offers support for rhyming and syllable counts (as well as other cool things), see [pronouncingpy](https://github.com/aparrish/pronouncingpy).
