@@ -5,13 +5,20 @@
 
 This Python program utilizes the Carnegie-Mellon University Pronouncing Dictionary to convert English text into the [International Phonetic Alphabet](https://en.wikipedia.org/wiki/International_Phonetic_Alphabet).
 
+### Installation ### 
+
+1. Download this directory locally 
+2. Run `python -m pip install .` in the same directory as ` setup.py`.
+
+### Key functions ###
+
 
 The `convert` function is used to take English text and convert it to IPA, like so:
 
 ```Python
 >>> import eng_to_ipa as ipa
 >>> ipa.convert("The quick brown fox jumped over the lazy dog.")
-'ðə kwɪk braʊn fɑks ʤəmpt ˈoʊvər ðə ˈlezi dɔg.'
+'ðə kwɪk braʊn fɑks ʤəmpt ˈoʊvər ðə ˈleɪzi dɔg.'
 ``` 
 
 Note that words that cannot be found in the CMU dictionary are simply reprinted with an asterisk.
@@ -37,12 +44,16 @@ markings (ˈ, ˌ) should be retained. Understood arguments are:
 * **mode** : *string, optional (default='sql')* - Accepts "sql" or "json", depending on which version of the database you'd like to use.
  As another option for JSON users, simply use the function `jonvert` instead of `convert`. 
    
+#### `ipa_list`
+
 The `ipa_list` function returns a list of each word as a list of all its possible transcriptions. It has all the same
 optional `stress_marks` and `keep_punct` parameters as `convert`.
 ```Python
 >>> ipa.ipa_list("The record was expensive.")
 [['ði', 'ðə'], ['rəˈkɔrd', 'rɪˈkɔrd', 'ˈrɛkərd'], ['wɑz'], ['ɪkˈspɛnsɪv.']]
 ```
+   
+#### `isin_cmu`
 
 The `isin_cmu` function takes a word (or list of words) and checks if it is in the CMU pronouncing dictionary (returns 
 `True` or `False`). If a list of words is provided, then `True` will only be returned if *every* provided word is in the dictionary.
@@ -53,6 +64,8 @@ True
 >>> ipa.isin_cmu("emoji")
 False
 ```
+   
+#### `get_rhymes`
 
 The `get_rhymes` function returns a list of rhymes for a word or set of words. 
 ```Python
@@ -61,6 +74,8 @@ The `get_rhymes` function returns a list of rhymes for a word or set of words.
 ```
 *Use the `jhymes` function instead to force usage of the JSON database.*
    
+#### `syllable_count`
+
 The `syllable_count` function returns an integer, corresponding to the number of syllables in a word. Returns a list of 
 syllable counts if more than one word is provided in the input string.
 
@@ -69,6 +84,6 @@ syllable counts if more than one word is provided in the input string.
 [3, 3]
 ```
 
-For another Python package that offers support for rhyming and syllable counts (as well as other cool things), see [pronouncingpy](https://github.com/aparrish/pronouncingpy).
+### Other Resources
 
-Note: I'd like to make this project easily available/installable from pip, but I don't know how. Looking for help!
+For another Python package that offers support for rhyming and syllable counts (as well as other cool things), see [pronouncingpy](https://github.com/aparrish/pronouncingpy).
