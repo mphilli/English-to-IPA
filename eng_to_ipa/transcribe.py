@@ -5,17 +5,24 @@ import eng_to_ipa.stress as stress
 from collections import defaultdict
 
 
-def mode_type(mode_in):
-    """In the case of "sql", this will return an sqlite cursor.
-       In the case of "json", this will return a json dictionary of the data."""
-    if mode_in.lower() == "sql":
-        import sqlite3
-        conn = sqlite3.connect(join(abspath(dirname(__file__)), "./resources/CMU_dict.db"))
-        return conn.cursor()
-    elif mode_in.lower() == "json":
-        import json
-        json_file = open(join(abspath(dirname(__file__)), "../eng_to_ipa/resources/CMU_dict.json"), encoding="UTF-8")
-        return json.load(json_file)
+class ModeType(object):
+
+    def __init__(self, mode):
+        self.name = mode
+        if mode.lower() == "sql":
+            import sqlite3
+            conn = sqlite3.connect(join(abspath(dirname(__file__)),
+                                        "./resources/CMU_dict.db"))
+            self.mode = conn.cursor()
+        elif mode.lower() == "json":
+            import json
+            json_file = open(join(abspath(dirname(__file__)),
+                                  "../eng_to_ipa/resources/CMU_dict.json"),
+                             encoding="UTF-8")
+            self.mode = json.load(json_file)
+
+    def __str__(self):
+        return self.name
 
 
 def preprocess(words):
@@ -29,8 +36,8 @@ def preserve_punc(words):
     words_preserved = []
     for w in words.split():
         punct_list = ["", preprocess(w), ""]
-        before = re.search("^([^A-Za-z0-9]+)[A-Za-z]", w)
-        after = re.search("[A-Za-z]([^A-Za-z0-9]+)$", w)
+        before = re.search(r"^([^A-Za-z0-9]+)[A-Za-z]", w)
+        after = re.search(r"[A-Za-z]([^A-Za-z0-9]+)$", w)
         if before:
             punct_list[0] = str(before.group(1))
         if after:
@@ -63,10 +70,11 @@ def _punct_replace_word(original, transcription):
 
 def fetch_words(words_in, db_type="sql"):
     """fetches a list of words from the database"""
-    asset = mode_type(db_type)
+    asset = ModeType(mode=db_type).mode
     if db_type.lower() == "sql":
         quest = "?, " * len(words_in)
-        asset.execute("SELECT word, phonemes FROM dictionary WHERE word IN ({0})".format(quest[:-2]), words_in)
+        asset.execute("SELECT word, phonemes FROM dictionary "
+                      "WHERE word IN ({0})".format(quest[:-2]), words_in)
         result = asset.fetchall()
         d = defaultdict(list)
         for k, v in result:
@@ -99,14 +107,14 @@ def cmu_to_ipa(cmu_list, mark=True, stress_marking='all'):
                "aw": "aʊ", "ay": "aɪ", "ch": "ʧ", "dh": "ð", "eh": "ɛ", "er": "ər",
                "hh": "h", "ih": "ɪ", "jh": "ʤ", "ng": "ŋ",  "ow": "oʊ", "oy": "ɔɪ",
                "sh": "ʃ", "th": "θ", "uh": "ʊ", "uw": "u", "zh": "ʒ", "iy": "i", "y": "j"}
-    ipa_list = []  # the final list of IPA tokens to be returned
+    final_list = []  # the final list of IPA tokens to be returned
     for word_list in cmu_list:
         ipa_word_list = []  # the word list for each word
         for word in word_list:
             if stress_marking:
                 word = stress.find_stress(word, type=stress_marking)
             else:
-                if re.sub("\d*", "", word.replace("__IGNORE__", "")) == "":
+                if re.sub(r"\d*", "", word.replace("__IGNORE__", "")) == "":
                     pass  # do not delete token if it's all numbers
                 else:
                     word = re.sub("[0-9]", "", word)
@@ -114,9 +122,8 @@ def cmu_to_ipa(cmu_list, mark=True, stress_marking='all'):
             if word.startswith("__IGNORE__"):
                 ipa_form = word.replace("__IGNORE__", "")
                 # mark words we couldn't transliterate with an asterisk:
-
                 if mark:
-                    if not re.sub("\d*", "", ipa_form) == "":
+                    if not re.sub(r"\d*", "", ipa_form) == "":
                         ipa_form += "*"
             else:
                 for piece in word.split(" "):
@@ -139,8 +146,8 @@ def cmu_to_ipa(cmu_list, mark=True, stress_marking='all'):
                 if not ipa_form.startswith(sym[0]):
                     ipa_form = ipa_form.replace(sym[0], sym[1])
             ipa_word_list.append(ipa_form)
-        ipa_list.append(sorted(list(set(ipa_word_list))))
-    return ipa_list
+        final_list.append(sorted(list(set(ipa_word_list))))
+    return final_list
 
 
 def get_top(ipa_list):
@@ -171,10 +178,8 @@ def get_all(ipa_list):
 
 def ipa_list(words_in, keep_punct=True, stress_marks='both', db_type="sql"):
     """Returns a list of all the discovered IPA transcriptions for each word."""
-    if type(words_in) == str:
-        words = [preserve_punc(w.lower())[0] for w in words_in.split()]
-    else:
-        words = [preserve_punc(w.lower())[0] for w in words_in]
+    words = [preserve_punc(w.lower())[0] for w in words_in.split()] \
+        if type(words_in) == str else [preserve_punc(w.lower())[0] for w in words_in]
     cmu = get_cmu([w[1] for w in words], db_type=db_type)
     ipa = cmu_to_ipa(cmu, stress_marking=stress_marks)
     if keep_punct:
@@ -192,16 +197,21 @@ def isin_cmu(word, db_type="sql"):
     return len(as_set) == len(set(word))
 
 
+def contains(ipa, db_type="sql"):
+    """Get any words that contain the IPA string. Returns the word and the IPA as a list."""
+    asset = ModeType(mode=db_type).mode
+    if db_type.lower() == "sql":
+        asset.execute("SELECT word, ipa FROM eng_ipa WHERE "
+                      "REPLACE(REPLACE(ipa, 'ˌ', ''), 'ˈ', '') "
+                      "LIKE \"%{}%\"".format(str(ipa)))
+        return [list(res) for res in asset.fetchall()]
+
+
 def convert(text, retrieve_all=False, keep_punct=True, stress_marks='both', mode="sql"):
     """takes either a string or list of English words and converts them to IPA"""
-    ipa = ipa_list(
-                   words_in=text,
-                   keep_punct=keep_punct,
-                   stress_marks=stress_marks,
-                   db_type=mode)
-    if retrieve_all:
-        return get_all(ipa)
-    return get_top(ipa)
+    ipa = ipa_list(words_in=text, keep_punct=keep_punct,
+                   stress_marks=stress_marks, db_type=mode)
+    return get_all(ipa) if retrieve_all else get_top(ipa)
 
 
 def jonvert(text, retrieve_all=False, keep_punct=True, stress_marks='both'):

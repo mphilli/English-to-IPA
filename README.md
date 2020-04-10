@@ -31,7 +31,8 @@ this parameter determines whether or not a list of all possible combinations of 
 markings (ˈ, ˌ) should be retained. Understood arguments are:
    * "primary" - retains primary stress only 
    * "secondary" - retains secondary stress only
-   * "both" - to keep both primary and secondary stress markers. 
+   * "both" - to keep both primary and secondary stress markers
+   * "none" - preserve neither primary nor secondary stress
    
 * **mode** : *string, optional (default='sql')* - Accepts "sql" or "json", depending on which version of the database you'd like to use.
  As another option for JSON users, simply use the function `jonvert` instead of `convert`. 

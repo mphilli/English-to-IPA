@@ -14,7 +14,7 @@ hiatus = [["er", "iy"], ["iy", "ow"], ["uw", "ow"], ["iy", "ah"], ["iy", "ey"], 
 
 def cmu_syllable_count(word):
     """count syllables based on CMU transcription"""
-    word = re.sub("\d", "", word).split(' ')
+    word = re.sub(r"\d", "", word).split(' ')
     if "__IGNORE__" in word[0]:
         return 0
     else:

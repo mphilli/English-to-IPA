@@ -1,5 +1,5 @@
 # Simple rhyming support. Call get_rhymes() on a word to find rhymes from the CMU dictionary.
-from eng_to_ipa.transcribe import mode_type, get_cmu, preprocess
+from eng_to_ipa.transcribe import ModeType, get_cmu, preprocess
 
 
 def remove_onset(word_in):
@@ -14,16 +14,16 @@ def get_rhymes(word, mode="sql"):
         return [get_rhymes(w) for w in word.split()]
     phones = remove_onset(preprocess(word))
     phones_full = get_cmu([preprocess(word)])[0][0]
+    asset = ModeType(mode=mode).mode
     if mode == "sql":
-        c = mode_type(mode)
-        c.execute("SELECT word, phonemes FROM dictionary WHERE phonemes " 
-                  "LIKE \"%{0}\" AND NOT word=\"{1}\" ".format(phones, word) +
-                  "AND NOT phonemes=\"{0}\"".format(phones_full))
+        asset.execute("SELECT word, phonemes FROM dictionary WHERE phonemes " 
+                      "LIKE \"%{0}\" AND NOT word=\"{1}\" ".format(phones, word) +
+                      "AND NOT phonemes=\"{0}\"".format(phones_full))
         # also don't return results that are the same but spelled differently
-        return sorted(list(set([r[0] for r in c.fetchall()])))
+        return sorted(list(set([r[0] for r in asset.fetchall()])))
     elif mode == "json":
         r_list = []
-        for key, val in mode_type(mode).items():
+        for key, val in asset.items():
             for v in val:
                 if v.endswith(phones) and word != key and v != phones_full:
                     r_list.append(key)
@@ -36,7 +36,7 @@ def jhymes(word):
 
 
 if __name__ == "__main__":
-    test = "testing"
+    test = "orange"
     rhymes = get_rhymes(test)
     for rhyme in rhymes:
         print(rhyme)
