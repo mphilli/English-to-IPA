@@ -7,7 +7,8 @@ This Python program utilizes the Carnegie-Mellon University Pronouncing Dictiona
 
 ### Installation ### 
 
-`python -m pip install eng_to_ipa`
+1. Download this directory locally 
+2. Run `python -m pip install .` in the same directory as ` setup.py`.
 
 ### Key functions ###
 
