@@ -16,10 +16,10 @@ class ModeType(object):
             self.mode = conn.cursor()
         elif mode.lower() == "json":
             import json
-            json_file = open(join(abspath(dirname(__file__)),
+            with open(join(abspath(dirname(__file__)),
                                   "../eng_to_ipa/resources/CMU_dict.json"),
-                             encoding="UTF-8")
-            self.mode = json.load(json_file)
+                             encoding="UTF-8") as json_file:
+              self.mode = json.load(json_file)
 
     def __str__(self):
         return self.name
