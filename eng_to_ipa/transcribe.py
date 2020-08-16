@@ -92,12 +92,29 @@ def get_cmu(tokens_in, db_type="sql"):
     """query the SQL database for the words and return the phonemes in the order of user_in"""
     result = fetch_words(tokens_in, db_type)
     ordered = []
+    space = ''
+
+    if language == 'cmu':
+        space = ' '
+
     for word in tokens_in:
         this_word = [[i[1] for i in result if i[0] == word]][0]
         if this_word:
             ordered.append(this_word[0])
         else:
-            ordered.append(["__IGNORE__" + word])
+            if( word.find('-') != -1 ):
+                # we couldn't transliterate a hyphenated word - try word parts
+                tmpresult = get_entries( word.split('-'), db_type=db_type, language=language )
+                if not tmpresult[0][0].startswith('__IGNORE__') and not tmpresult[1][0].startswith('__IGNORE__'):
+                    this_word = []
+                    for this_word1 in tmpresult[0]:
+                        for this_word2 in tmpresult[1]:
+                            this_word.append(this_word1 + space + this_word2)
+                    ordered.append(this_word)
+                else:
+                    ordered.append(["__IGNORE__" + word])
+            else:
+                ordered.append(["__IGNORE__" + word])
     return ordered
 
 
