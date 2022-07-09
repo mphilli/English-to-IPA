@@ -43,7 +43,12 @@ markings (ˈ, ˌ) should be retained. Understood arguments are:
    
 * **mode** : *string, optional (default='sql')* - Accepts "sql" or "json", depending on which version of the database you'd like to use.
  As another option for JSON users, simply use the function `jonvert` instead of `convert`. 
-   
+
+```Python
+>>> ipa.convert("I went to Japan last summer.", retrieve_all=True, stress_marks=False)
+['aɪ wɛnt tu ʤəpæn læst səmər.', 'aɪ wɛnt tə ʤəpæn læst səmər.', 'aɪ wɛnt tɪ ʤəpæn læst səmər.']
+```
+
 #### `ipa_list`
 
 The `ipa_list` function returns a list of each word as a list of all its possible transcriptions. It has all the same
