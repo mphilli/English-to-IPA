@@ -101,10 +101,13 @@ def get_cmu(tokens_in, db_type="sql"):
     return ordered
 
 
-def cmu_to_ipa(cmu_list, mark=True, stress_marking='all'):
+def cmu_to_ipa(cmu_list, mark=True, stress_marking='all', return_all=False):
     """converts the CMU word lists into IPA transcriptions"""
-    cmu_list = [[x[0].replace("ah1", "q1").replace("ah0", "ə0")] for x in cmu_list]
-    symbols = {"a": "ə", "ey": "eɪ", "aa": "ɑ", "ae": "æ", "ah": "ə", "ao": "ɔ", "q": "ʌ",
+    # cmu_list = [[x[0].replace("ah1", "q1").replace("ah0", "+0")] for x in cmu_list]
+    for i in range(0, len(cmu_list)):
+        for j in range(0, len(cmu_list[i])):
+            cmu_list[i][j] = cmu_list[i][j].replace("ah1", "q1").replace("ah0", "+0")
+    symbols = {"a": "ə", "ey": "eɪ", "aa": "ɑ", "ae": "æ", "+": "ə", "ao": "ɔ", "q": "ʌ",
                "aw": "aʊ", "ay": "aɪ", "ch": "ʧ", "dh": "ð", "eh": "ɛ", "er": "ər",
                "hh": "h", "ih": "ɪ", "jh": "ʤ", "ng": "ŋ",  "ow": "oʊ", "oy": "ɔɪ",
                "sh": "ʃ", "th": "θ", "uh": "ʊ", "uw": "u", "zh": "ʒ", "iy": "i", "y": "j"}
@@ -147,13 +150,16 @@ def cmu_to_ipa(cmu_list, mark=True, stress_marking='all'):
                 if not ipa_form.startswith(sym[0]):
                     ipa_form = ipa_form.replace(sym[0], sym[1])
             ipa_word_list.append(ipa_form)
-        final_list.append(sorted(list(set(ipa_word_list))))
+        if not return_all:
+            final_list.append(sorted(list(set(ipa_word_list))))
+        else:
+            final_list.append(sorted(list(ipa_word_list)))
     return final_list
 
 
 def get_top(ipa_list):
     """Returns only the one result for a query. If multiple entries for words are found, only the first is used."""
-    return ' '.join([word_list[-1] for word_list in ipa_list])
+    return ' '.join([word_list[0] for word_list in ipa_list])
 
 
 def get_all(ipa_list):
@@ -182,7 +188,7 @@ def ipa_list(words_in, keep_punct=True, stress_marks='both', db_type="sql"):
     words = [preserve_punc(w.lower())[0] for w in words_in.split()] \
         if type(words_in) == str else [preserve_punc(w.lower())[0] for w in words_in]
     cmu = get_cmu([w[1] for w in words], db_type=db_type)
-    ipa = cmu_to_ipa(cmu, stress_marking=stress_marks)
+    ipa = cmu_to_ipa(cmu, stress_marking=stress_marks, return_all=True)
     if keep_punct:
         ipa = _punct_replace_word(words, ipa)
     return ipa
@@ -218,3 +224,5 @@ def convert(text, retrieve_all=False, keep_punct=True, stress_marks='both', mode
 def jonvert(text, retrieve_all=False, keep_punct=True, stress_marks='both'):
     """Forces use of JSON database for fetching phoneme data."""
     return convert(text, retrieve_all, keep_punct, stress_marks, mode="json")
+
+
