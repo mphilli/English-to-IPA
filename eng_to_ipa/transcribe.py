@@ -101,7 +101,7 @@ def get_cmu(tokens_in, db_type="sql"):
     return ordered
 
 
-def cmu_to_ipa(cmu_list, mark=True, stress_marking='all', return_all=False):
+def cmu_to_ipa(cmu_list, mark=True, stress_marking='all'):
     """converts the CMU word lists into IPA transcriptions"""
     # cmu_list = [[x[0].replace("ah1", "q1").replace("ah0", "+0")] for x in cmu_list]
     for i in range(0, len(cmu_list)):
@@ -150,10 +150,7 @@ def cmu_to_ipa(cmu_list, mark=True, stress_marking='all', return_all=False):
                 if not ipa_form.startswith(sym[0]):
                     ipa_form = ipa_form.replace(sym[0], sym[1])
             ipa_word_list.append(ipa_form)
-        if not return_all:
-            final_list.append(sorted(list(set(ipa_word_list))))
-        else:
-            final_list.append(sorted(list(ipa_word_list)))
+        final_list.append(sorted(list(ipa_word_list)))
     return final_list
 
 
@@ -188,7 +185,7 @@ def ipa_list(words_in, keep_punct=True, stress_marks='both', db_type="sql"):
     words = [preserve_punc(w.lower())[0] for w in words_in.split()] \
         if type(words_in) == str else [preserve_punc(w.lower())[0] for w in words_in]
     cmu = get_cmu([w[1] for w in words], db_type=db_type)
-    ipa = cmu_to_ipa(cmu, stress_marking=stress_marks, return_all=True)
+    ipa = cmu_to_ipa(cmu, stress_marking=stress_marks)
     if keep_punct:
         ipa = _punct_replace_word(words, ipa)
     return ipa
