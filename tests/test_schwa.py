@@ -4,7 +4,7 @@ import unittest
 
 
 class TestConversion(unittest.TestCase):
-    """Simple unit testing for the rhymes function(s)."""
+    """Simple unit testing for the different schwa symbols."""
 
     def test_schwa(self):
         # with mode: sql
