@@ -150,7 +150,7 @@ def cmu_to_ipa(cmu_list, mark=True, stress_marking='all'):
                 if not ipa_form.startswith(sym[0]):
                     ipa_form = ipa_form.replace(sym[0], sym[1])
             ipa_word_list.append(ipa_form)
-        final_list.append(sorted(list(ipa_word_list)))
+        final_list.append(list(ipa_word_list))
     return final_list
 
 
