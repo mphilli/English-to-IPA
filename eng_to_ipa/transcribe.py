@@ -27,7 +27,7 @@ class ModeType(object):
 
 def preprocess(words):
     """Returns a string of words stripped of punctuation"""
-    punct_str = '!"#$%&\'()*+,-./:;<=>/?@[\\]^_`{|}~«» '
+    punct_str = '!"#$%&\'()*+,-./:;<=>/?@[\\]^_`{|}~«» …'
     return ' '.join([w.strip(punct_str).lower() for w in words.split()])
 
 
